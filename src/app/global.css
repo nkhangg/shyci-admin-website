@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+#editor > div {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#editor .w-md-editor-bar {
+    display: none;
+}
+
+#editor .wmde-markdown.wmde-markdown-color,
+#editor .w-md-editor-toolbar {
+    background-color: #f9f9f9;
+}

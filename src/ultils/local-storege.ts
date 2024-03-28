@@ -12,3 +12,11 @@ export const getToken = () => {
 
     return token;
 };
+
+export const getConfig = (key: string) => {
+    return localStorage.getItem(key);
+};
+
+export const setConfig = (key: string, value: string) => {
+    return localStorage.setItem(key, value);
+};

@@ -52,6 +52,7 @@ interface ISize {
     price: number;
     store: number;
     discount: number;
+    product?: IDProduct;
 }
 
 interface IDProduct {
@@ -68,4 +69,84 @@ interface IDProduct {
 interface IRefChildImages {
     reset?: () => void;
     init?: (data: IImageProduct[]) => void;
+}
+
+interface IFilter {
+    search?: string;
+    page?: number;
+    deleted?: boolean | string;
+    limit?: number;
+    sort?: string;
+}
+
+interface IFilterProduct extends IFilter {
+    categories?: number;
+    size?: string;
+    min?: number;
+    max?: number;
+    deleted?: boolean;
+}
+
+interface IFilterOrder extends IFilter {
+    min?: string;
+    max?: string;
+    state?: string;
+}
+
+interface IOrder {
+    createdAt: string;
+    id: number;
+    fullname: string;
+    phone: string;
+    email: string;
+    province: string;
+    district: string;
+    ward: string;
+    address: string;
+    description: string;
+    customer: Customer;
+    detail: IDetailInfoOrder | null;
+    state: 'pending' | 'delivered' | 'refunded';
+}
+
+interface IDOrder extends IOrder {
+    customer: Customer;
+    data: IOrderDetail[];
+    detail: IDetailInfoOrder | null;
+}
+
+interface Customer {
+    createdAt: string;
+    id: string;
+    username: string;
+    phone: string | null;
+    email: string | null;
+}
+
+export interface IOrderDetail {
+    createdAt: string;
+    id: number;
+    price: number;
+    discount: number;
+    quantity: number;
+    size: ISize;
+}
+
+interface IRefOders {
+    pagination?: IPagination<IOrder>['meta'];
+}
+
+export interface IDetailInfoOrder {
+    createdAt: string;
+    id: number;
+    payAt: string | null;
+    cancel: boolean;
+    reason: string | null;
+    read: boolean;
+    print: number;
+}
+
+interface IChartSeri {
+    name: string;
+    data: number[];
 }

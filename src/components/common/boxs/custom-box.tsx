@@ -11,7 +11,7 @@ export interface ICustomBoxProps {
 export default function CustomBox({ title, children, classnames, actions }: ICustomBoxProps) {
     return (
         <div
-            className={cls('w-full rounded-lg shadow-box border px-5 pt-7 pb-5 flex flex-col justify-between gap-4', {
+            className={cls('w-full rounded-lg shadow-box border px-5 pt-7 pb-5 flex flex-col justify-between gap-4 ', {
                 [classnames?.parent || '']: !!classnames?.parent,
             })}
         >

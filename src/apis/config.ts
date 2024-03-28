@@ -35,7 +35,6 @@ axiosConfig.interceptors.response.use(
         // Any status code that lie within the range of 2xx cause this function to trigger
         // Do something with response data
 
-        console.log('response', response);
         return response;
     },
     async function (error) {
@@ -66,6 +65,8 @@ axiosConfig.interceptors.response.use(
                     localStorage.setItem(keysLocalStorage.refresh, refreshToken);
 
                     config.headers.Authorization = `Bearer ${token}`;
+
+                    console.log('reset token is running...');
                     return axiosConfig(config);
                 }
             } catch (error) {

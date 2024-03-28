@@ -23,11 +23,12 @@ type Values = zod.infer<typeof schema>;
 export interface IInventoriesProps {
     currentInventories: ISize[];
     displayData?: ISize;
-    onAddSize?: (data: ISize) => void;
+    onAddSize?: (data: ISize) => Promise<void>;
+    onCancel?: () => void;
     refChild?: MutableRefObject<{ reset: () => void }>;
 }
 
-export default function Inventories({ currentInventories, displayData, refChild, onAddSize }: IInventoriesProps) {
+export default function Inventories({ currentInventories, displayData, refChild, onAddSize, onCancel }: IInventoriesProps) {
     const [applayGlobalDiscout, setApplayGlobalDiscout] = useState<boolean>(true);
 
     const defaultValues = { price: 0, store: 0, discount: 0, name: 'S' } satisfies Values;
@@ -60,7 +61,7 @@ export default function Inventories({ currentInventories, displayData, refChild,
                 return;
             }
 
-            onAddSize({
+            await onAddSize({
                 id: uuid(),
                 ...values,
             } as ISize);
@@ -82,7 +83,7 @@ export default function Inventories({ currentInventories, displayData, refChild,
             Object.keys(displayData).forEach((item) => {
                 const key = item as keyof ISize;
 
-                if (key === 'id') return;
+                if (key === 'id' || key === 'product') return;
 
                 setValue(key as 'name' | 'price' | 'store' | 'discount', displayData[key]);
             });
@@ -151,16 +152,21 @@ export default function Inventories({ currentInventories, displayData, refChild,
                     name="name"
                     render={({ field }) => (
                         <FormControl error={Boolean(errors.name)} sx={{ width: '100%' }}>
-                            <Dropdown {...field} data={constants.sizes} title="Size" />
+                            <Dropdown showAllItem={false} disabled={!!displayData} {...field} data={constants.sizes} title="Size" />
                             {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
                         </FormControl>
                     )}
                 />
             </div>
 
-            <div className="w-full flex items-center justify-end">
+            <div className="w-full flex items-center justify-end gap-4">
+                {displayData && (
+                    <Button onClick={onCancel} variant="contained" color="secondary">
+                        Hủy
+                    </Button>
+                )}
                 <Button onClick={handleSubmit(onSubmit)} variant="contained">
-                    Tạo kho
+                    {displayData ? 'Cập nhật kho' : 'Tạo kho'}
                 </Button>
             </div>
         </div>

@@ -4,3 +4,5 @@ import type { Theme as BaseTheme } from '@mui/material/styles/createTheme';
 export type Theme = Omit<BaseTheme, 'palette'> & CssVarsTheme;
 
 export type ColorScheme = 'dark' | 'light';
+
+export type TypeColorChip = 'warning' | 'success' | 'error' | 'default' | 'secondary' | 'primary' | 'info';

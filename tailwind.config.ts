@@ -34,7 +34,8 @@ const config: Config = {
                 'primary-dark': '#000',
             },
             boxShadow: {
-                box: 'rgba(149, 157, 165, 0.2) 0px 8px 24px;',
+                box: 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
+                'box-fill': 'rgba(149, 157, 165, 0.8) 0px 8px 24px',
             },
         },
     },

@@ -9,17 +9,26 @@ import ImageProductItem from './image';
 import { IImageProduct, IRefChildImages } from '../../../../../interface';
 import { v4 as uuidv4 } from 'uuid';
 import CustomBox from '@/components/common/boxs/custom-box';
+import { useConfirm } from 'material-ui-confirm';
+import { deleteImagesProduct } from '@/apis/handlers/products';
 
 export interface IImagesProductProps {
     onFiles?: (files: File[]) => void;
     onImages?: (images: IImageProduct[]) => void;
     refChild?: MutableRefObject<IRefChildImages>;
+    onDeleteSucess?: () => void;
+    options?: {
+        mode?: 'create' | 'update';
+        id?: string;
+    };
 }
 
-export default function ImagesProduct({ onFiles, onImages, refChild }: IImagesProductProps) {
+export default function ImagesProduct({ onFiles, onImages, onDeleteSucess, refChild, options = { mode: 'create' } }: IImagesProductProps) {
     const [imagePreview, setImagePreview] = useState<IImageProduct[]>([]);
 
     const [deleteItems, setDeleteItems] = useState<IImageProduct[]>([]);
+
+    const comfirm = useConfirm();
 
     useImperativeHandle(refChild, () => {
         return {
@@ -108,8 +117,32 @@ export default function ImagesProduct({ onFiles, onImages, refChild }: IImagesPr
 
             if (serverImages.length && serverImages.length < imagePreview.length) {
                 // call api to delete image
+                if (options.mode === 'create' || !options.id) return;
+
+                comfirm({ title: `Bạn muốn xóa ${deleteItems.length} ảnh của sản phẩm này ?`, description: 'Ảnh bị xóa sẽ không thể khôi phục' }).then(async () => {
+                    const response = await deleteImagesProduct(options.id as string, serverImages.map((item) => item.id) as number[]);
+
+                    if (!response) {
+                        toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
+                        return false;
+                    }
+
+                    if (response.status && response.code === 403) {
+                        toast.error('Bạn không có quyền sử dụng chức năng này');
+                        return false;
+                    }
+                    if (response.status && response.code === 402) {
+                        return false;
+                    }
+
+                    if (onDeleteSucess) {
+                        onDeleteSucess();
+                    }
+                    toast.success('Xóa thành công');
+                });
             }
         } catch (error) {
+            toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
         } finally {
             setDeleteItems([]);
         }
@@ -149,7 +182,7 @@ export default function ImagesProduct({ onFiles, onImages, refChild }: IImagesPr
     }, [imagePreview]);
 
     return (
-        <CustomBox title={'Thông tin cơ bản'}>
+        <CustomBox title={'Thông tin khác'}>
             <TitleBox
                 title="Ảnh sản phẩm"
                 className="border-2 border-dashed rounded-lg p-5 bg-[#f9f9f9]"

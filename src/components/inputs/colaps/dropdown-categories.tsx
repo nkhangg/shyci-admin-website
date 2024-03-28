@@ -11,7 +11,7 @@ export interface IDropdownCateriesProps {}
 export default function DropdownCateries(props: Omit<IDropdownProps, 'data'>) {
     const { data, isError } = useQuery({
         queryKey: ['get-categories'],
-        queryFn: getCategories,
+        queryFn: () => getCategories(),
     });
 
     if (isError && data?.code !== 200) {

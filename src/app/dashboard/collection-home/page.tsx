@@ -13,6 +13,7 @@ import { useUser } from '@/hooks/use-user';
 import { paths } from '@/paths';
 import useHandlePagination from '@/hooks/use-handle-pagination';
 import { useRouter } from 'next/navigation';
+import NotFound from '@/components/erorrs/not-found';
 
 export default function Page(): React.JSX.Element {
     const user = useUser();
@@ -61,6 +62,8 @@ export default function Page(): React.JSX.Element {
                     data={data.data}
                 />
             )}
+
+            {data?.data && data.data.items.length <= 0 && <NotFound />}
 
             {data?.code === 403 && (
                 <div className="my-8">

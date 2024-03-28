@@ -3,7 +3,7 @@ import CustomBox from '@/components/common/boxs/custom-box';
 import Input from '@/components/inputs/input';
 import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, InputLabel, OutlinedInput } from '@mui/material';
 import { z as zod } from 'zod';
-import React, { MutableRefObject, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Editor from '@/components/inputs/edittor';
@@ -15,11 +15,11 @@ import { useConfirm } from 'material-ui-confirm';
 import FullpageLoading from '@/components/common/loadings/fullpage-loading';
 import { toast } from 'react-toastify';
 import DropdownCateries from '@/components/inputs/colaps/dropdown-categories';
-import { createProduct, getProduct } from '@/apis/handlers/products';
+import { createProduct, deleteProduct, deleteSizeProduct, getProduct, updateInfoProduct } from '@/apis/handlers/products';
 import { useRouter } from 'next/navigation';
-import useGetProduct from '@/hooks/products/use-get-product';
 import { useQuery } from '@tanstack/react-query';
 import { paths } from '@/paths';
+import { ProductService } from '@/ultils/services/products.service';
 
 const schema = zod.object({
     name: zod.string().min(1, { message: 'Tên sản phẩm bắt buộc' }),
@@ -50,7 +50,7 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
 
     const [displaySize, setDisplaySize] = useState<ISize | undefined>(undefined);
 
-    const { data, isFetching } = useQuery({
+    const { data, isFetching, refetch } = useQuery({
         queryKey: ['get-product', id],
         queryFn: () => getProduct(id),
     });
@@ -127,6 +127,12 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                         toast.error('Bạn không có quyền sử dụng chức năng này');
                         return;
                     }
+
+                    if (response.status && response.code === 400) {
+                        toast.warn(response.message);
+                        return;
+                    }
+
                     if (response.status && response.code === 402) {
                         return;
                     }
@@ -138,26 +144,50 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                if (!data) {
+                    toast.warn('Có lỗi trong quá trình xử lí');
+                    return;
+                }
+
+                comfirm({ title: 'Bạn muốn cập nhật sản phẩm này ?' }).then(async () => {
+                    try {
+                        setLoading(true);
+
+                        const resultInfo = await ProductService.updateInfoProduct(data.data, values, curSizes, images);
+
+                        if (resultInfo) {
+                            refetch();
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
+                    } finally {
+                        setLoading(false);
+                    }
+                });
             }
-            console.log({ values, images, curSizes });
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [curSizes, images, mode, validator],
+        [curSizes, data, images, mode, validator],
     );
 
-    const handleAddSize = (size: ISize) => {
+    const handleAddSize = async (size: ISize) => {
         if (displaySize) {
-            const findData = curSizes.find((item) => item.id === displaySize.id);
+            await comfirm({ title: 'Bạn muốn cập nhật kho này ?' }).then(() => {
+                const findData = curSizes.find((item) => item.id === displaySize.id);
 
-            if (findData) {
-                findData.name = size.name;
-                findData.discount = size.discount;
-                findData.price = size.price;
-                findData.store = size.store;
-            }
+                if (findData) {
+                    findData.name = size.name;
+                    findData.discount = size.discount;
+                    findData.price = size.price;
+                    findData.store = size.store;
+                }
 
-            setCurSizes([...curSizes]);
-            setDisplaySize(undefined);
+                setCurSizes([...curSizes]);
+                setDisplaySize(undefined);
+                return;
+            });
 
             return;
         }
@@ -165,9 +195,14 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
         setCurSizes([...curSizes, size]);
     };
 
+    const handleCancelUpdateInventories = () => {
+        refInventories.current.reset();
+        setDisplaySize(undefined);
+    };
+
     const handleDeleteSizeItem = useCallback(
         (size: ISize) => {
-            comfirm({ title: 'Bạn muốn xóa kho này ?' }).then(() => {
+            comfirm({ title: 'Bạn muốn xóa kho này ?' }).then(async () => {
                 try {
                     if (typeof size.id === 'string') {
                         const newCurrentSize = curSizes.filter((item) => item.id !== size.id);
@@ -177,26 +212,44 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
 
                     if (typeof size.id === 'number') {
                         // handle api to delete on server here
+                        if (mode !== 'update' || !data?.data) return;
+
+                        const response = await deleteSizeProduct(data.data.id, size.id);
+
+                        if (!response) {
+                            toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
+                            return false;
+                        }
+
+                        if (response.status && response.code === 403) {
+                            toast.error('Bạn không có quyền sử dụng chức năng này');
+                            return false;
+                        }
+                        if (response.status && response.code === 402) {
+                            return false;
+                        }
+
+                        refetch();
+                        toast.success('Xóa thành công');
                     }
                 } catch (error) {
                     console.log(error);
+                    toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
                 }
             });
         },
-        [comfirm, curSizes],
+        [comfirm, curSizes, data?.data, mode, refetch],
     );
 
     useEffect(() => {
         if (mode !== 'update' || !id) return;
 
-        if ((!data && !isFetching) || (data && data.code === 404)) {
-            toast.warn('Không tìm thấy sản phẩm phù hợp');
+        if ((!data && !isFetching) || (data && data.code !== 200)) {
+            toast.warn(data?.message || 'Có lỗi trong quá trình xử lí');
             router.push(paths.dashboard.products);
             return;
         }
         setLoading(false);
-
-        console.log('data in aciton', data);
 
         requestIdleCallback(() => {
             const prodcut = data?.data;
@@ -210,7 +263,7 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
             setValue('showSize', prodcut.showSize);
 
             // sizes
-            setCurSizes(prodcut.sizes);
+            setCurSizes([...prodcut.sizes]);
 
             // images
 
@@ -221,9 +274,46 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mode, id, data, isFetching]);
 
+    const handleDeleteProduct = async () => {
+        comfirm({ title: 'Bạn muốn sản phẩm này ?' }).then(async () => {
+            try {
+                if (!id) return;
+
+                setLoading(true);
+                const response = await deleteProduct(id);
+
+                if (!response) {
+                    toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
+                    return;
+                }
+
+                if (response.status && response.code === 403) {
+                    toast.error('Bạn không có quyền sử dụng chức năng này');
+                    return;
+                }
+
+                if (response.status && response.code !== 200) {
+                    toast.warn(response.message);
+                    return;
+                }
+
+                if (response.status && response.code === 402) {
+                    return;
+                }
+
+                router.push(paths.dashboard.products);
+            } catch (error) {
+                console.log(error);
+                toast.warn('Có lỗi xảy ra trong quá trình xử lí. Vui lòng thử lại');
+            } finally {
+                setLoading(false);
+            }
+        });
+    };
+
     return (
         <section>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-[minmax(900px,_3fr)_2fr] gap-6">
+            <div className="grid lg:grid-cols-[minmax(900px,_3fr)_2fr] gap-6">
                 <div className="w-full flex flex-col gap-8">
                     {/* Thông tin cơ bản */}
                     <CustomBox
@@ -253,6 +343,7 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                                 </FormControl>
                             )}
                         />
+                        {mode === 'update' && data && <Input title="Mã sản phẩm" disabled={true} value={data.data?.id} />}
                         <Controller
                             control={control}
                             name="name"
@@ -283,11 +374,17 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                             body: 'flex flex-col gap-4',
                         }}
                     >
-                        <Inventories displayData={displaySize} onAddSize={handleAddSize} currentInventories={curSizes} refChild={refInventories} />
+                        <Inventories
+                            displayData={displaySize}
+                            onAddSize={handleAddSize}
+                            onCancel={handleCancelUpdateInventories}
+                            currentInventories={curSizes}
+                            refChild={refInventories}
+                        />
                     </CustomBox>
                 </div>
                 <div className="w-full flex flex-col gap-8">
-                    <ImagesProduct refChild={refImages} onImages={(data) => setImages(data)} />
+                    <ImagesProduct onDeleteSucess={refetch} options={{ id, mode }} refChild={refImages} onImages={(data) => setImages(data)} />
 
                     <CustomBox title="Danh mục của sản phẩm">
                         <Controller
@@ -295,7 +392,7 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                             name="categoriesID"
                             render={({ field }) => (
                                 <FormControl error={Boolean(errors.categoriesID)} sx={{ width: '100%' }}>
-                                    <DropdownCateries {...field} value={field.value + ''} title="Danh mục" />
+                                    <DropdownCateries showAllItem={false} {...field} value={field.value + ''} title="Danh mục" />
                                     {errors.categoriesID ? <FormHelperText>{errors.categoriesID.message}</FormHelperText> : null}
                                 </FormControl>
                             )}
@@ -312,13 +409,19 @@ export default function ActionProduct({ mode = 'create', id, refChild }: IProduc
                         </CustomBox>
                     )}
 
-                    <div className="w-full flex items-center justify-center">
+                    <div className="w-full flex items-center justify-center gap-4">
+                        {mode === 'update' && id && (
+                            <Button onClick={handleDeleteProduct} variant="contained" color="error">
+                                Xóa sản phẩm
+                            </Button>
+                        )}
+
                         <Button onClick={handleSubmit(onSubmit)} variant="contained">
                             {mode === 'create' ? 'Tạo sản phẩm' : 'Cập nhật sản phẩm'}
                         </Button>
                     </div>
                 </div>
-            </form>
+            </div>
 
             {loading && <FullpageLoading />}
         </section>

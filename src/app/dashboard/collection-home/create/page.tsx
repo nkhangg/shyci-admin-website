@@ -65,7 +65,6 @@ export default function ConllectionCreatePage(props: IConllectionCreatePageProps
     };
 
     const handleSubmitData = (data: ICollectionCreateItem) => {
-        console.log(data);
         setItemsData([...itemsData, data]);
     };
 

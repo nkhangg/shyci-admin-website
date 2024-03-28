@@ -4,26 +4,35 @@ import classNames from 'classnames';
 import { IPagination } from '../../../interface';
 
 export interface IPaginationProps {
-    data: IPagination<any>['meta'];
+    data?: IPagination<any>['meta'];
     onNext?: (data: IPagination<any>['meta']) => void;
     onPrev?: (data: IPagination<any>['meta']) => void;
     onDeletes?: () => void;
+    showDelete?: boolean;
 }
 
-export default function Pagination({ data, onNext, onPrev, onDeletes }: IPaginationProps) {
+export default function Pagination({
+    data = { currentPage: 1, totalPages: 0, totalItems: 0, itemsPerPage: 10, itemCount: 0 },
+    showDelete = true,
+    onNext,
+    onPrev,
+    onDeletes,
+}: IPaginationProps) {
     return (
         <div className="w-full flex items-center justify-between p-4 gap-5 text-sm select-none">
-            <div className="pl-5">
-                <span
-                    onClick={onDeletes}
-                    className={classNames('', {
-                        ['text-gray-300']: !onDeletes,
-                        ['text-heart hover:underline cursor-pointer']: onDeletes != undefined,
-                    })}
-                >
-                    Delete
-                </span>
-            </div>
+            {showDelete && (
+                <div className="pl-5">
+                    <span
+                        onClick={onDeletes}
+                        className={classNames('', {
+                            ['text-gray-300']: !onDeletes,
+                            ['text-heart hover:underline cursor-pointer']: onDeletes != undefined,
+                        })}
+                    >
+                        Delete
+                    </span>
+                </div>
+            )}
             <div className="flex items-center gap-5">
                 <span>
                     {data.currentPage} / {data.totalPages}

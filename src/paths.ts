@@ -9,6 +9,7 @@ export const paths = {
         account: '/dashboard/account',
         categories: '/dashboard/categories',
         customers: '/dashboard/customers',
+        admins: '/dashboard/admins',
         integrations: '/dashboard/integrations',
         settings: '/dashboard/settings',
     },

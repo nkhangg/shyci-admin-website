@@ -42,8 +42,8 @@ export default function Pagination({
                     <div
                         onClick={onPrev && data.currentPage > 1 ? () => onPrev(data) : undefined}
                         className={classNames('p-2 rounded transition-all ease-linear  ', {
-                            ['hover:bg-gray-400 active:scale-95 cursor-pointer']: data.currentPage > 1,
-                            ['text-gray-300']: data.currentPage <= 1,
+                            ['hover:bg-gray-400 active:scale-95 cursor-pointer']: data.currentPage > 1 && data.totalPages > 0,
+                            ['text-gray-300']: data.currentPage <= 1 || data.totalPages == 0,
                         })}
                     >
                         <CaretLeft />
@@ -51,8 +51,8 @@ export default function Pagination({
                     <div
                         onClick={onNext && data.currentPage < data.totalPages ? () => onNext(data) : undefined}
                         className={classNames('p-2 rounded transition-all ease-linear ', {
-                            ['hover:bg-gray-400 active:scale-95 cursor-pointer']: data.currentPage < data.totalPages,
-                            ['text-gray-300']: data.currentPage == data.totalPages,
+                            ['hover:bg-gray-400 active:scale-95 cursor-pointer']: data.currentPage < data.totalPages && data.totalPages > 0,
+                            ['text-gray-300']: data.currentPage == data.totalPages || data.totalPages == 0,
                         })}
                     >
                         <CaretRight />

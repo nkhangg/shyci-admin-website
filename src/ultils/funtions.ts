@@ -55,3 +55,28 @@ export function removeFalsyValues(obj: Record<string, any>): Record<string, any>
     }
     return newObj;
 }
+
+export function removeDuplicates(arr1: string[], arr2: string[]): string[] {
+    // Create an empty array to store unique elements
+    let uniqueArray: string[] = [];
+
+    // Iterate through each element in arr1
+    arr1.forEach((item) => {
+        // Check if the current element is not present in arr2
+        if (!arr2.includes(item)) {
+            // If not present, push it to the uniqueArray
+            uniqueArray.push(item);
+        }
+    });
+
+    // Iterate through each element in arr2
+    arr2.forEach((item) => {
+        // Check if the current element is not present in arr1
+        if (!arr1.includes(item)) {
+            // If not present, push it to the uniqueArray
+            uniqueArray.push(item);
+        }
+    });
+
+    return uniqueArray;
+}

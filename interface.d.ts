@@ -150,3 +150,40 @@ interface IChartSeri {
     name: string;
     data: number[];
 }
+
+interface IDCustomer {
+    createdAt: string;
+    id: string;
+    username: string;
+    phone: string;
+    email: string;
+    province: string | null;
+    ward: string | null;
+    address: string | null;
+    district: string | null;
+}
+
+interface IAdmin {
+    createdAt: string;
+    id: string;
+    username: string;
+    fullname: string;
+    authorizations: IAuthorization[];
+}
+
+interface IAuthorization {
+    createdAt: string;
+    id: number | string;
+    role: IRole;
+}
+
+interface IRole {
+    createdAt: string;
+    id: number | string;
+    name: string;
+    description: string;
+}
+
+interface IRefRolesHandle {
+    reset?: () => void;
+}

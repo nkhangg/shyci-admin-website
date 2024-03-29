@@ -1,7 +1,7 @@
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 import { ChartPie as ChartPieIcon } from '@phosphor-icons/react/dist/ssr/ChartPie';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
-import { CoatHanger, Hoodie, Images, Package } from '@phosphor-icons/react/dist/ssr';
+import { CoatHanger, Hoodie, Images, Package, UserPlus } from '@phosphor-icons/react/dist/ssr';
 import { PlugsConnected as PlugsConnectedIcon } from '@phosphor-icons/react/dist/ssr/PlugsConnected';
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
@@ -12,6 +12,7 @@ export const navIcons = {
     products: Hoodie,
     orders: Package,
     categories: CoatHanger,
+    admins: UserPlus,
     'plugs-connected': PlugsConnectedIcon,
     'x-square': XSquare,
     'collection-home': Images,

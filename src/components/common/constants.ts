@@ -27,4 +27,13 @@ export const constants = {
         delivered: { label: 'Delivered', color: 'success' },
         refunded: { label: 'Refunded', color: 'error' },
     },
+    rolesMap: {
+        create: { label: 'Create', color: 'primary' },
+        edit: { label: 'Edit', color: 'warning' },
+        delete: { label: 'Delete', color: 'error' },
+        read: { label: 'Read', color: 'success' },
+        root: { label: 'Root', color: 'default' },
+    },
+
+    roles: ['create', 'edit', 'delete', 'read', 'root'],
 };

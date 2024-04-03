@@ -25,6 +25,10 @@ export function filesValidator(files: File[], curFiles: any[]) {
 }
 
 export const toCurrency = (price: number): string => {
+    if (price >= 1000000000) {
+        return price / 1000000000 + ' tỷ';
+    }
+
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND',

@@ -9,12 +9,17 @@ import { Chip, capitalize } from '@mui/material';
 export interface IRolesHandleProps {
     author: IAuthorization[];
     data: IDropdownData[];
-    onRoles?: (data: IDropdownData[]) => void;
     refRolesHandle?: MutableRefObject<IRefRolesHandle | undefined>;
+    options?: {
+        showDescription?: boolean;
+    };
+    onRoles?: (data: IDropdownData[]) => void;
 }
 
-export default function RolesHandle({ data, author, refRolesHandle, onRoles }: IRolesHandleProps) {
+export default function RolesHandle({ data, author, refRolesHandle, options = { showDescription: false }, onRoles }: IRolesHandleProps) {
     const [rolesData, setRolesData] = useState<IDropdownData[]>([]);
+
+    const [value, setValue] = useState('0');
 
     const handleChange = (value: number) => {
         const foud = author.find((item) => item.role.id === value);
@@ -24,9 +29,13 @@ export default function RolesHandle({ data, author, refRolesHandle, onRoles }: I
             return;
         }
 
+        setValue(value + '');
+
         const newValue = data.find((item) => item.id == value + '');
 
         if (!newValue) return;
+
+        if (rolesData.includes(newValue)) return;
 
         setRolesData([...rolesData, newValue]);
     };
@@ -35,6 +44,10 @@ export default function RolesHandle({ data, author, refRolesHandle, onRoles }: I
         const newValue = rolesData.filter((i) => i.id !== item.id);
 
         setRolesData(newValue);
+
+        if (item.id == value) {
+            setValue('0');
+        }
     };
 
     useEffect(() => {
@@ -48,6 +61,7 @@ export default function RolesHandle({ data, author, refRolesHandle, onRoles }: I
         return {
             reset: () => {
                 setRolesData([]);
+                setValue('0');
             },
         };
     });
@@ -59,10 +73,14 @@ export default function RolesHandle({ data, author, refRolesHandle, onRoles }: I
                     onChange={(e) => {
                         handleChange(Number(e.target.value));
                     }}
-                    showAllItem={false}
+                    nameDefault="None"
+                    showAllItem={true}
                     title="Quyền hạn"
                     data={data}
+                    value={value}
                 />
+
+                {options.showDescription && <span className="text-sm italic">Mặc định tài khoản khi tạo sẽ sỡ hữu quyền đọc (Read)</span>}
 
                 {rolesData.length > 0 && (
                     <div className="flex items-center gap-4">

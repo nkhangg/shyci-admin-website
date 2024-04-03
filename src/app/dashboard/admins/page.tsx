@@ -1,6 +1,6 @@
 'use client';
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
@@ -15,6 +15,7 @@ import { CustomersTable } from '@/components/dashboard/customer/customers-table'
 import FullpageLoading from '@/components/common/loadings/fullpage-loading';
 import AdminTable from '@/components/dashboard/admins/admin-table';
 import { getAdmins } from '@/apis/handlers/admins';
+import Link from 'next/link';
 
 export interface IAdminsPageProps {}
 
@@ -49,6 +50,10 @@ export default function AdminsPage(props: IAdminsPageProps) {
                     <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
                         <Typography variant="h4">Admins</Typography>
                     </Stack>
+
+                    <Button component={Link} href={paths.dashboard.admins + '/create'} variant="contained">
+                        Tạo mới
+                    </Button>
                 </Stack>
                 <CustomersFilters
                     pagination={{ data: data?.meta, onNext: handleNext, onPrev: handlePrev }}

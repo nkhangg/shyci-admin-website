@@ -17,17 +17,18 @@ import { Chart } from '@/components/core/chart';
 
 export interface SalesProps {
     chartSeries: { name: string; data: number[] }[];
+    sync?: () => void;
     sx?: SxProps;
 }
 
-export function Sales({ chartSeries, sx }: SalesProps): React.JSX.Element {
+export function Sales({ chartSeries, sx, sync }: SalesProps): React.JSX.Element {
     const chartOptions = useChartOptions();
 
     return (
         <Card sx={sx}>
             <CardHeader
                 action={
-                    <Button color="inherit" size="small" startIcon={<ArrowClockwiseIcon fontSize="var(--icon-fontSize-md)" />}>
+                    <Button onClick={sync} color="inherit" size="small" startIcon={<ArrowClockwiseIcon fontSize="var(--icon-fontSize-md)" />}>
                         Sync
                     </Button>
                 }
@@ -36,12 +37,12 @@ export function Sales({ chartSeries, sx }: SalesProps): React.JSX.Element {
             <CardContent>
                 <Chart height={350} options={chartOptions} series={chartSeries} type="bar" width="100%" />
             </CardContent>
-            <Divider />
+            {/* <Divider />
             <CardActions sx={{ justifyContent: 'flex-end' }}>
                 <Button color="inherit" endIcon={<ArrowRightIcon fontSize="var(--icon-fontSize-md)" />} size="small">
                     Overview
                 </Button>
-            </CardActions>
+            </CardActions> */}
         </Card>
     );
 }
@@ -72,7 +73,7 @@ function useChartOptions(): ApexOptions {
         },
         yaxis: {
             labels: {
-                formatter: (value) => (value > 0 ? `${value}K` : `${value}`),
+                formatter: (value) => (value > 0 ? `${value} đơn` : `${value} đơn`),
                 offsetX: -10,
                 style: { colors: theme.palette.text.secondary },
             },

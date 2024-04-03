@@ -12,19 +12,21 @@ export interface IDropdownProps {
     name?: string;
     ref?: ((instance: unknown) => void) | React.RefObject<unknown> | null | undefined;
     showAllItem?: boolean;
+    nameDefault?: string;
     onChange?: (event: SelectChangeEvent<string>, child: React.ReactNode) => void;
     onBlur?: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }
 
-export default function Dropdown({ title, data, lable, showAllItem = true, ...props }: IDropdownProps) {
+export default function Dropdown({ title, data, lable, showAllItem = true, nameDefault = 'Tất cả', ...props }: IDropdownProps) {
     const id = useId();
 
     const dataMemo = useMemo(() => {
         if (showAllItem) {
-            return [{ id: 0, name: 'Tất cả' }, ...data];
+            return [{ id: 0, name: nameDefault }, ...data];
         }
 
         return data;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, showAllItem]);
 
     return (

@@ -30,6 +30,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { CreditCard } from '@phosphor-icons/react/dist/ssr';
 import { OrderService } from '@/ultils/services/orders.service';
 import { useConfirm } from 'material-ui-confirm';
+import useGetCurrentPage from '@/hooks/use-get-current-page';
 
 const statusMap = {
     pending: { label: 'Pending', color: 'warning' },
@@ -55,6 +56,8 @@ export function LatestOrders({
     options = { showall: true, showLink: false, filter: false, showComfrimOrder: false },
 }: LatestOrdersProps): React.JSX.Element {
     const [filters, setFilters] = useState<IFilterOrder>({});
+
+    const { countIndex } = useGetCurrentPage();
 
     const baseUrl = paths.dashboard.orders;
 
@@ -97,6 +100,7 @@ export function LatestOrders({
                         <Table sx={{ minWidth: 800 }}>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell>No</TableCell>
                                     <TableCell>Order</TableCell>
                                     <TableCell>Customer</TableCell>
                                     <TableCell sortDirection="desc">Date</TableCell>
@@ -105,11 +109,12 @@ export function LatestOrders({
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {orders.map((order) => {
+                                {orders.map((order, index) => {
                                     const { label, color } = statusMap[order.state] ?? { label: 'Unknown', color: 'default' };
 
                                     return (
                                         <TableRow hover key={order.id}>
+                                            <TableCell>{countIndex(index)}</TableCell>
                                             <TableCell>#{order.id}</TableCell>
                                             <TableCell>{order.fullname}</TableCell>
                                             <TableCell>{dayjs(order.createdAt).format('MMM D, YYYY')}</TableCell>

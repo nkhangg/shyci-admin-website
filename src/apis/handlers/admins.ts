@@ -1,5 +1,5 @@
 import axios from '../config';
-import { IAdmin, IBaseApi, IDropdownData, IFilter, IPagination, IRole } from '../../../interface';
+import { IAdmin, IBaseApi, IChartsDashborad, IDropdownData, IFilter, IPagination, IRole } from '../../../interface';
 import { removeFalsyValues } from '@/ultils/funtions';
 import { AxiosError } from 'axios';
 
@@ -112,6 +112,34 @@ export const updateAdmin = async (id: string, data: { fullname: string; roles: I
     }
 };
 
+export const createAdmin = async (data: { fullname: string; username: string; password: string; roles: IDropdownData[] }) => {
+    try {
+        const rolesIds: string[] = [];
+
+        data.roles.forEach((item) => {
+            rolesIds.push(item.name.toLowerCase());
+        });
+
+        const response = await axios({
+            method: 'POST',
+            url: 'admins',
+            data: {
+                fullname: data.fullname,
+                username: data.username,
+                password: data.password,
+                ...(rolesIds.length ? { roles: rolesIds } : {}),
+            },
+        });
+
+        if (!response) return null;
+
+        return response.data as IBaseApi<IAdmin>;
+    } catch (error) {
+        const erorrs = error as AxiosError;
+        return erorrs.response?.data as unknown as IBaseApi<IAdmin>;
+    }
+};
+
 export const changePasswordAdmin = async (id: string, data: { oldPassword: string; newPassword: string }) => {
     try {
         const response = await axios({
@@ -128,5 +156,21 @@ export const changePasswordAdmin = async (id: string, data: { oldPassword: strin
     } catch (error) {
         const erorrs = error as AxiosError;
         return erorrs.response?.data as unknown as IBaseApi<IAdmin>;
+    }
+};
+
+export const getDashboard = async () => {
+    try {
+        const response = await axios({
+            method: 'GET',
+            url: 'dashboards',
+        });
+
+        if (!response) return null;
+
+        return response.data as IBaseApi<IChartsDashborad>;
+    } catch (error) {
+        const erorrs = error as AxiosError;
+        return erorrs.response?.data as unknown as IBaseApi<IChartsDashborad>;
     }
 };

@@ -215,6 +215,7 @@ export default function OrderDetailPage({ params }: IOrderDetailPageProps) {
                                     </>
                                 );
                             })()}
+                            {dataMemo.detail?.payAt && <span>Xác nhận thanh toán lúc: {dayjs(dataMemo.detail.payAt).format('DD/MM/YYYY HH:ss')}</span>}
                         </CustomBox>
 
                         {dataMemo.detail && dataMemo.detail.cancel && (

@@ -21,6 +21,7 @@ import { getProducts } from '@/apis/handlers/products';
 import { IDProduct } from '../../../../interface';
 import { paths } from '@/paths';
 import Link from 'next/link';
+import NotFound from '@/components/erorrs/not-found';
 
 export interface LatestProductsProps {
     sx?: SxProps;
@@ -42,35 +43,38 @@ export function LatestProducts({ sx }: LatestProductsProps): React.JSX.Element {
             <CardHeader title="Latest products" />
             <Divider />
             <List>
-                {products.map((product, index) => (
-                    <ListItem divider={index < products.length - 1} key={product.id}>
-                        <ListItemAvatar>
-                            {product.images && product.images.length > 0 ? (
-                                <Box component="img" src={product.images[0].name} sx={{ borderRadius: 1, height: '48px', width: '48px', objectFit: 'cover' }} />
-                            ) : (
-                                <Box
-                                    sx={{
-                                        borderRadius: 1,
-                                        backgroundColor: 'var(--mui-palette-neutral-200)',
-                                        height: '48px',
-                                        width: '48px',
-                                    }}
-                                />
-                            )}
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={product.name}
-                            primaryTypographyProps={{ variant: 'subtitle1' }}
-                            secondary={`Updated ${dayjs(product.createdAt).format('MMM D, YYYY')}`}
-                            secondaryTypographyProps={{ variant: 'body2' }}
-                        />
-                        <IconButton edge="end">
-                            <Link href={paths.dashboard.products + `/${product.id}`}>
-                                <DotsThreeVerticalIcon weight="bold" />
-                            </Link>
-                        </IconButton>
-                    </ListItem>
-                ))}
+                {products.length > 0 &&
+                    products.map((product, index) => (
+                        <ListItem divider={index < products.length - 1} key={product.id}>
+                            <ListItemAvatar>
+                                {product.images && product.images.length > 0 ? (
+                                    <Box component="img" src={product.images[0].name} sx={{ borderRadius: 1, height: '48px', width: '48px', objectFit: 'cover' }} />
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            borderRadius: 1,
+                                            backgroundColor: 'var(--mui-palette-neutral-200)',
+                                            height: '48px',
+                                            width: '48px',
+                                        }}
+                                    />
+                                )}
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={product.name}
+                                primaryTypographyProps={{ variant: 'subtitle1' }}
+                                secondary={`Updated ${dayjs(product.createdAt).format('MMM D, YYYY')}`}
+                                secondaryTypographyProps={{ variant: 'body2' }}
+                            />
+                            <IconButton edge="end">
+                                <Link href={paths.dashboard.products + `/${product.id}`}>
+                                    <DotsThreeVerticalIcon weight="bold" />
+                                </Link>
+                            </IconButton>
+                        </ListItem>
+                    ))}
+
+                {products.length <= 0 && <NotFound />}
             </List>
             <Divider />
             <CardActions sx={{ justifyContent: 'flex-end' }}>

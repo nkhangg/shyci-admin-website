@@ -154,6 +154,7 @@ interface IChartSeri {
 interface IDCustomer {
     createdAt: string;
     id: string;
+    fullname: string | null;
     username: string;
     phone: string;
     email: string;
@@ -186,4 +187,17 @@ interface IRole {
 
 interface IRefRolesHandle {
     reset?: () => void;
+}
+
+export interface IChartsDashborad {
+    budget?: IChartCard;
+    cutomers?: IChartCard;
+    tasks?: IChartCard;
+    totalProfit?: IChartCard;
+    charts?: IChartSeri[];
+}
+
+export interface IChartCard {
+    value: number;
+    evolution: number;
 }

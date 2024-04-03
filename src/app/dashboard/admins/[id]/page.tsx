@@ -19,6 +19,7 @@ import useRoles from '@/hooks/use-roles';
 import RolesHandle from '@/components/dashboard/admins/roles-handle';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import NotFound from '@/components/erorrs/not-found';
 
 const schema = zod.object({
     fullname: zod.string().min(1, { message: 'Tên không được trống' }),
@@ -227,6 +228,8 @@ export default function AdminDetail({ params }: IAdminDetailProps) {
                     </div>
                 </form>
             )}
+
+            {data?.code === 404 && <NotFound />}
 
             {(isLoading || loading) && <FullpageLoading />}
         </section>

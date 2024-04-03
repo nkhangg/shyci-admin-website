@@ -26,6 +26,7 @@ export function CustomersTable({ data }: CustomersTableProps): React.JSX.Element
                     <TableHead>
                         <TableRow>
                             <TableCell>No</TableCell>
+                            <TableCell>Họ và tên</TableCell>
                             <TableCell>Tên đăng nhập</TableCell>
                             <TableCell>Email</TableCell>
                             <TableCell>Địa chỉ mua hàng gần nhất</TableCell>
@@ -40,6 +41,7 @@ export function CustomersTable({ data }: CustomersTableProps): React.JSX.Element
                                     <TableRow hover key={row.id}>
                                         <TableCell padding="checkbox">{countIndex(index)}</TableCell>
 
+                                        <TableCell>{row.fullname || 'Chưa cập nhật'}</TableCell>
                                         <TableCell>{row.username}</TableCell>
                                         <TableCell>{row.email}</TableCell>
                                         <TableCell>
